@@ -161,37 +161,97 @@ function BoxesInVan({ boxes }: { boxes: BoxData[] }) {
   const vanHeight = van.height / 100;
   
   const boxComponents = useMemo(() => {
-    let x = -vanDepth / 2 + 0.1;
-    let y = -vanHeight / 2 + 0.1;
-    let z = -vanWidth / 2 + 0.1;
-    let maxHeightInRow = 0;
+    const placedBoxes: {
+      x: number;
+      y: number;
+      z: number;
+      width: number;
+      height: number;
+      depth: number;
+    }[] = [];
+    
+    // Function to check if a new box would overlap with any existing boxes
+    const checkOverlap = (newBox: typeof placedBoxes[0]) => {
+      return placedBoxes.some(box => {
+        // Check for overlap in all three dimensions
+        const overlapX = 
+          newBox.x < box.x + box.depth && 
+          newBox.x + newBox.depth > box.x;
+        
+        const overlapY = 
+          newBox.y < box.y + box.height && 
+          newBox.y + newBox.height > box.y;
+        
+        const overlapZ = 
+          newBox.z < box.z + box.width && 
+          newBox.z + newBox.width > box.z;
+        
+        return overlapX && overlapY && overlapZ;
+      });
+    };
+    
+    // Function to find a valid position for a new box
+    const findValidPosition = (boxDepth: number, boxHeight: number, boxWidth: number) => {
+      // Start at the bottom of the van
+      let y = -vanHeight / 2 + 0.1;
+      
+      while (y + boxHeight <= vanHeight / 2) {
+        // Try positions across the floor
+        for (let z = -vanWidth / 2 + 0.1; z + boxWidth <= vanWidth / 2; z += 0.1) {
+          for (let x = -vanDepth / 2 + 0.1; x + boxDepth <= vanDepth / 2; x += 0.1) {
+            const newBox = {
+              x,
+              y,
+              z,
+              width: boxWidth,
+              height: boxHeight,
+              depth: boxDepth
+            };
+            
+            if (!checkOverlap(newBox)) {
+              return { x, y, z };
+            }
+          }
+        }
+        
+        // If no position found on this level, try the next level up
+        y += 0.1;
+      }
+      
+      // If no valid position is found inside the van
+      return null;
+    };
     
     return boxes.map((box, index) => {
       const boxDepth = box.length / 100;
       const boxWidth = box.width / 100;
       const boxHeight = box.height / 100;
       
-      if (x + boxDepth > vanDepth / 2) {
-        x = -vanDepth / 2 + 0.1;
-        z += maxHeightInRow + 0.1;
-        maxHeightInRow = 0;
+      // Find a valid position for this box
+      const validPosition = findValidPosition(boxDepth, boxHeight, boxWidth);
+      
+      // If no valid position is found, return null (box won't be rendered)
+      if (!validPosition) {
+        return null;
       }
       
-      if (z + boxWidth > vanWidth / 2) {
-        x = -vanDepth / 2 + 0.1;
-        z = -vanWidth / 2 + 0.1;
-        y += maxHeightInRow + 0.1;
-        maxHeightInRow = 0;
-      }
+      const { x, y, z } = validPosition;
+      
+      // Add this box to the list of placed boxes
+      placedBoxes.push({
+        x,
+        y,
+        z,
+        width: boxWidth,
+        height: boxHeight,
+        depth: boxDepth
+      });
       
       const position: [number, number, number] = [
         x + boxDepth / 2,
-        y + boxHeight / 2, 
+        y + boxHeight / 2,
         z + boxWidth / 2
       ];
-      
-      x += boxDepth + 0.1;
-      maxHeightInRow = Math.max(maxHeightInRow, boxHeight);
       
       return (
         <Box
@@ -205,7 +265,7 @@ function BoxesInVan({ boxes }: { boxes: BoxData[] }) {
           }}
         />
       );
-    });
+    }).filter(Boolean); // Filter out null values for boxes that couldn't be placed
   }, [boxes, vanDepth, vanWidth, vanHeight]);
   
   return <>{boxComponents}</>;
