@@ -199,6 +199,10 @@ function BoxesInVan({ boxes }: { boxes: BoxData[] }) {
           position={position}
           size={[boxDepth, boxHeight, boxWidth]}
           color={box.color || `hsl(${(index * 137) % 360}, 100%, 50%)`}
+          info={{
+            dimensions: `${box.length}×${box.width}×${box.height}`,
+            weight: box.weight
+          }}
         />
       );
     });
