@@ -14,7 +14,13 @@ export function Box({ position, size, color }: BoxProps) {
   return (
     <mesh ref={meshRef} position={position}>
       <boxGeometry args={[width, height, depth]} />
-      <meshStandardMaterial color={color} transparent={false} opacity={1.0} />
+      <meshStandardMaterial 
+        color={color} 
+        transparent={true} 
+        opacity={0.8} 
+        roughness={0.3}
+        metalness={0.1}
+      />
       <lineSegments>
         <edgesGeometry args={[new THREE.BoxGeometry(width, height, depth)]} />
         <lineBasicMaterial color="black" />
