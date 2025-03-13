@@ -1,8 +1,8 @@
 "use client";
 
-import { BoxData } from "@/app/components/box-form";
 import { Button } from "@/components/ui/button";
 import { calculateVolume } from "@/lib/calculations";
+import { BoxData } from "./BoxForm";
 
 interface BoxListProps {
   boxes: BoxData[];

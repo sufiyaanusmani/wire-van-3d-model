@@ -1,4 +1,4 @@
-import { BoxData } from '@/app/components/box-form';
+import { BoxData } from "@/app/components/forms/BoxForm";
 
 // Calculate volume of a box
 export function calculateVolume(box: BoxData): number {

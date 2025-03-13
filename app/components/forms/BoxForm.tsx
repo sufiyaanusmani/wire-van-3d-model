@@ -12,6 +12,7 @@ const boxSchema = z.object({
   width: z.string().transform((val) => parseFloat(val)),
   height: z.string().transform((val) => parseFloat(val)),
   weight: z.string().transform((val) => parseFloat(val)),
+  color: z.string().optional(),
 });
 
 export type BoxData = z.infer<typeof boxSchema>;
@@ -24,10 +25,10 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
   const form = useForm<z.infer<typeof boxSchema>>({
     resolver: zodResolver(boxSchema),
     defaultValues: {
-      length: "",
-      width: "",
-      height: "",
-      weight: "",
+      length: 0,
+      width: 0,
+      height: 0,
+      weight: 0,
     },
   });
 

@@ -1,33 +1,22 @@
 import React, { useRef } from 'react';
-import { Box as BoxProps } from '@/lib/store';
+import * as THREE from 'three';
 
-interface Props {
-  box: BoxProps;
+export interface BoxProps {
+  position: [number, number, number];
+  size: [number, number, number];
+  color: string;
 }
 
-export function Box({ box }: Props) {
+export function Box({ position, size, color }: BoxProps) {
   const meshRef = useRef<THREE.Mesh>(null);
-  const { width, height, depth, position, color } = box;
-  
-  // Convert dimensions from cm to meters for Three.js
-  const w = width / 100;
-  const h = height / 100;
-  const d = depth / 100;
-  
-  // Convert positions from cm to meters
-  const [x, y, z] = position.map(p => p / 100);
+  const [width, height, depth] = size;
   
   return (
-    <mesh 
-      ref={meshRef} 
-      position={[x, y + h/2, z]} // Position box on the floor with y offset for half height
-    >
-      <boxGeometry args={[w, h, d]} />
-      <meshStandardMaterial color={color} transparent opacity={0.8} />
-      
-      {/* Add wireframe */}
+    <mesh ref={meshRef} position={position}>
+      <boxGeometry args={[width, height, depth]} />
+      <meshStandardMaterial color={color} transparent={false} opacity={1.0} />
       <lineSegments>
-        <edgesGeometry args={[new THREE.BoxGeometry(w, h, d)]} />
+        <edgesGeometry args={[new THREE.BoxGeometry(width, height, depth)]} />
         <lineBasicMaterial color="black" />
       </lineSegments>
     </mesh>

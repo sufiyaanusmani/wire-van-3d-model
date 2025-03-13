@@ -1,10 +1,10 @@
 import { create } from 'zustand';
-import { BoxData } from '@/app/components/box-form';
-import { 
-  calculateTotalVolume, 
-  calculateTotalWeight, 
-  calculateCapacityUsage 
+import {
+  calculateTotalVolume,
+  calculateTotalWeight,
+  calculateCapacityUsage
 } from '@/lib/calculations';
+import { BoxData } from '@/app/components/forms/BoxForm';
 
 interface VanDimensions {
   width: number;
@@ -13,8 +13,13 @@ interface VanDimensions {
   maxWeight: number;
 }
 
+// Update BoxData interface or extend it
+export interface BoxWithColor extends BoxData {
+  color: string;
+}
+
 interface BoxStore {
-  boxes: BoxData[];
+  boxes: BoxWithColor[];
   van: VanDimensions;
   addBox: (box: BoxData) => void;
   removeBox: (index: number) => void;
@@ -34,19 +39,23 @@ export const useBoxStore = create<BoxStore>((set, get) => ({
     depth: 300,
     maxWeight: 1000
   },
-  addBox: (box) => set((state) => ({ 
-    boxes: [...state.boxes, box] 
+  addBox: (box) => set((state) => ({
+    boxes: [
+      ...state.boxes,
+      {
+        ...box,
+        // Generate a vibrant random color
+        color: `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`
+      }
+    ]
   })),
-  removeBox: (index) => set((state) => ({ 
-    boxes: state.boxes.filter((_, i) => i !== index) 
+  removeBox: (index) => set((state) => ({
+    boxes: state.boxes.filter((_, i) => i !== index)
   })),
   clearBoxes: () => set({ boxes: [] }),
   updateVan: (dimensions) => set({ van: dimensions }),
   getTotalVolume: () => calculateTotalVolume(get().boxes),
   getTotalWeight: () => calculateTotalWeight(get().boxes),
   getCapacityUsage: () => calculateCapacityUsage(get().boxes, get().van),
-  getWeightCapacityUsage: () => {
-    const totalWeight = calculateTotalWeight(get().boxes);
-    return (totalWeight / get().van.maxWeight) * 100;
-  }
+  getWeightCapacityUsage: () => (get().getTotalWeight() / get().van.maxWeight) * 100
 }));
