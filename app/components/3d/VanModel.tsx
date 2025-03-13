@@ -6,6 +6,7 @@ import { PerspectiveCamera, OrbitControls } from '@react-three/drei';
 import { useBoxStore } from '@/lib/store';
 import { Box } from './Box';
 import { BoxData } from '../forms/BoxForm';
+import { Ground } from './Ground';
 
 function WireFrameVan() {
   const van = useBoxStore(state => state.van);
@@ -105,6 +106,7 @@ export function VanModel() {
         <ambientLight intensity={0.5} />
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
         <PerspectiveCamera makeDefault position={[5, 5, 5]} />
+        <Ground />
         <WireFrameVan />
         <BoxesInVan boxes={boxes} />
         <OrbitControls />
