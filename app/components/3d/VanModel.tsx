@@ -46,16 +46,6 @@ function WireFrameVan() {
         <meshStandardMaterial color="#a1c7dc" transparent opacity={0.7} />
       </mesh>
       
-      {/* Side windows - driver and passenger */}
-      <mesh position={[depth/2 + 0.8, -height/6, width/2 + 0.01]} rotation={[0, Math.PI/2, 0]}>
-        <planeGeometry args={[0.7, height/3]} />
-        <meshStandardMaterial color="#a1c7dc" transparent opacity={0.7} side={2} />
-      </mesh>
-      <mesh position={[depth/2 + 0.8, -height/6, -width/2 - 0.01]} rotation={[0, -Math.PI/2, 0]}>
-        <planeGeometry args={[0.7, height/3]} />
-        <meshStandardMaterial color="#a1c7dc" transparent opacity={0.7} side={2} />
-      </mesh>
-      
       {/* Front grill/radiator */}
       <mesh position={[depth/2 + 1.8, -height/3, 0]}>
         <boxGeometry args={[0.1, height/5, width-0.3]} />
