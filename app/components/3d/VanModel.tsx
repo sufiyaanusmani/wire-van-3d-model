@@ -15,7 +15,7 @@ function WireFrameVan() {
   const depth = van.depth / 100;
   
   // Define a wheel height offset
-  const wheelOffset = 0.11; // Adjust this value as needed to move wheels higher
+  const wheelOffset = 0.01; // Adjust this value as needed to move wheels higher
   
   return (
     <group>
