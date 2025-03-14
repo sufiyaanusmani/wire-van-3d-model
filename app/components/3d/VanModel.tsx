@@ -14,6 +14,9 @@ function WireFrameVan() {
   const height = van.height / 100;
   const depth = van.depth / 100;
   
+  // Define a wheel height offset
+  const wheelOffset = 0.11; // Adjust this value as needed to move wheels higher
+  
   return (
     <group>
       {/* Cargo area - wireframe */}
@@ -96,47 +99,47 @@ function WireFrameVan() {
         <meshStandardMaterial color="#222" />
       </mesh>
       
-      {/* Wheels - Front */}
-      <mesh position={[depth/3, -height/2, width/2]} rotation={[Math.PI/2, 0, 0]}>
+      {/* Wheels - Front - moved up by wheelOffset */}
+      <mesh position={[depth/3, -height/2 + wheelOffset, width/2]} rotation={[Math.PI/2, 0, 0]}>
         <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
         <meshStandardMaterial color="#333" />
       </mesh>
-      <mesh position={[depth/3, -height/2, -width/2]} rotation={[Math.PI/2, 0, 0]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
-        <meshStandardMaterial color="#333" />
-      </mesh>
-      
-      {/* Wheels - Middle */}
-      <mesh position={[0, -height/2, width/2]} rotation={[Math.PI/2, 0, 0]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
-        <meshStandardMaterial color="#333" />
-      </mesh>
-      <mesh position={[0, -height/2, -width/2]} rotation={[Math.PI/2, 0, 0]}>
+      <mesh position={[depth/3, -height/2 + wheelOffset, -width/2]} rotation={[Math.PI/2, 0, 0]}>
         <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
         <meshStandardMaterial color="#333" />
       </mesh>
       
-      {/* Wheels - Back */}
-      <mesh position={[-depth/3, -height/2, width/2]} rotation={[Math.PI/2, 0, 0]}>
+      {/* Wheels - Middle - moved up by wheelOffset */}
+      <mesh position={[0, -height/2 + wheelOffset, width/2]} rotation={[Math.PI/2, 0, 0]}>
         <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
         <meshStandardMaterial color="#333" />
       </mesh>
-      <mesh position={[-depth/3, -height/2, -width/2]} rotation={[Math.PI/2, 0, 0]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
-        <meshStandardMaterial color="#333" />
-      </mesh>
-      
-      {/* Cabin wheels */}
-      <mesh position={[depth/2 + 1.1, -height/2, width/2]} rotation={[Math.PI/2, 0, 0]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
-        <meshStandardMaterial color="#333" />
-      </mesh>
-      <mesh position={[depth/2 + 1.1, -height/2, -width/2]} rotation={[Math.PI/2, 0, 0]}>
+      <mesh position={[0, -height/2 + wheelOffset, -width/2]} rotation={[Math.PI/2, 0, 0]}>
         <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
         <meshStandardMaterial color="#333" />
       </mesh>
       
-      {/* Add tires/wheel caps for more detail */}
+      {/* Wheels - Back - moved up by wheelOffset */}
+      <mesh position={[-depth/3, -height/2 + wheelOffset, width/2]} rotation={[Math.PI/2, 0, 0]}>
+        <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
+        <meshStandardMaterial color="#333" />
+      </mesh>
+      <mesh position={[-depth/3, -height/2 + wheelOffset, -width/2]} rotation={[Math.PI/2, 0, 0]}>
+        <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
+        <meshStandardMaterial color="#333" />
+      </mesh>
+      
+      {/* Cabin wheels - moved up by wheelOffset */}
+      <mesh position={[depth/2 + 1.1, -height/2 + wheelOffset, width/2]} rotation={[Math.PI/2, 0, 0]}>
+        <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
+        <meshStandardMaterial color="#333" />
+      </mesh>
+      <mesh position={[depth/2 + 1.1, -height/2 + wheelOffset, -width/2]} rotation={[Math.PI/2, 0, 0]}>
+        <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
+        <meshStandardMaterial color="#333" />
+      </mesh>
+      
+      {/* Add tires/wheel caps for more detail - moved up by wheelOffset */}
       {[
         [depth/2 + 1.1, width/2],  // new cabin wheel - right side
         [depth/2 + 1.1, -width/2], // new cabin wheel - left side
@@ -147,7 +150,7 @@ function WireFrameVan() {
         [-depth/3, width/2],
         [-depth/3, -width/2]
       ].map((pos, idx) => (
-        <mesh key={idx} position={[pos[0], -height/2, pos[1]]} rotation={[Math.PI/2, 0, 0]}>
+        <mesh key={idx} position={[pos[0], -height/2 + wheelOffset, pos[1]]} rotation={[Math.PI/2, 0, 0]}>
           <cylinderGeometry args={[0.15, 0.15, 0.21, 16]} />
           <meshStandardMaterial color="#111" />
         </mesh>
