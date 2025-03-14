@@ -4,8 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { useBoxStore } from "@/lib/store";
+import { wouldExceedLimits } from "@/lib/utils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const boxSchema = z.object({
   length: z.string().transform((val) => parseFloat(val)),
@@ -22,6 +27,21 @@ interface BoxFormProps {
 }
 
 export function BoxForm({ onAddBox }: BoxFormProps) {
+  const [error, setError] = useState<string | null>(null);
+  
+  // Get existing boxes and van configuration from store
+  const boxes = useBoxStore(state => state.boxes);
+  const van = useBoxStore(state => state.van);
+  
+  // Calculate if any limits are already reached
+  const vanVolume = van.width * van.height * van.depth;
+  const totalVolume = boxes.reduce((sum, box) => sum + (box.length * box.width * box.height), 0);
+  const totalWeight = boxes.reduce((sum, box) => sum + box.weight, 0);
+  
+  const volumeExceeded = totalVolume >= vanVolume;
+  const weightExceeded = totalWeight >= van.maxWeight;
+  const limitsReached = volumeExceeded || weightExceeded;
+  
   const form = useForm<z.infer<typeof boxSchema>>({
     resolver: zodResolver(boxSchema),
     defaultValues: {
@@ -33,6 +53,23 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
   });
 
   function onSubmit(values: z.infer<typeof boxSchema>) {
+    setError(null);
+    
+    // Check if adding this box would exceed any limits
+    const check = wouldExceedLimits(
+      values, 
+      boxes, 
+      van.width, 
+      van.height, 
+      van.depth, 
+      van.maxWeight
+    );
+    
+    if (check.exceeds) {
+      setError(check.reason || "Cannot add box: capacity limits exceeded");
+      return;
+    }
+    
     onAddBox(values);
     form.reset();
   }
@@ -40,6 +77,23 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
+        {limitsReached && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {volumeExceeded ? "Van volume capacity reached. " : ""}
+              {weightExceeded ? "Van weight capacity reached." : ""}
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -50,6 +104,7 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
                 <FormControl>
                   <Input type="number" step="0.01" placeholder="Length" {...field} />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -62,6 +117,7 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
                 <FormControl>
                   <Input type="number" step="0.01" placeholder="Width" {...field} />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -74,6 +130,7 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
                 <FormControl>
                   <Input type="number" step="0.01" placeholder="Height" {...field} />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -86,11 +143,12 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
                 <FormControl>
                   <Input type="number" step="0.01" placeholder="Weight" {...field} />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        <Button type="submit">Add Box</Button>
+        <Button type="submit" disabled={limitsReached}>Add Box</Button>
       </form>
     </Form>
   );
