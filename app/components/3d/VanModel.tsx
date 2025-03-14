@@ -136,8 +136,20 @@ function WireFrameVan() {
         <meshStandardMaterial color="#333" />
       </mesh>
       
+      {/* Cabin wheels */}
+      <mesh position={[depth/2 + 1.1, -height/2, width/2]} rotation={[Math.PI/2, 0, 0]}>
+        <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
+        <meshStandardMaterial color="#333" />
+      </mesh>
+      <mesh position={[depth/2 + 1.1, -height/2, -width/2]} rotation={[Math.PI/2, 0, 0]}>
+        <cylinderGeometry args={[0.3, 0.3, 0.2, 16]} />
+        <meshStandardMaterial color="#333" />
+      </mesh>
+      
       {/* Add tires/wheel caps for more detail */}
       {[
+        [depth/2 + 1.1, width/2],  // new cabin wheel - right side
+        [depth/2 + 1.1, -width/2], // new cabin wheel - left side
         [depth/3, width/2],
         [depth/3, -width/2],
         [0, width/2],
