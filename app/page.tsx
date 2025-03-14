@@ -5,8 +5,10 @@ import { BoxList } from "@/app/components/forms/BoxList";
 import { VanModel } from "@/app/components/3d/VanModel";
 import { VanConfigForm } from "@/app/components/forms/VanConfigForm";
 import { CapacityOverview } from "@/app/components/CapacityOverview";
+import { CargoPlanner } from "@/app/components/CargoPlanner";
 import { useBoxStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Home() {
   const { 
@@ -24,10 +26,23 @@ export default function Home() {
         <div className="md:col-span-1 space-y-6">
           <VanConfigForm />
           
-          <div className="border rounded-md p-4">
-            <h2 className="text-lg font-semibold mb-4">Add Boxes</h2>
-            <BoxForm onAddBox={addBox} />
-          </div>
+          <Tabs defaultValue="ai" className="w-full">
+            <TabsList className="grid grid-cols-2 mb-4">
+              <TabsTrigger value="ai">AI Planner</TabsTrigger>
+              <TabsTrigger value="manual">Manual Entry</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="ai">
+              <CargoPlanner />
+            </TabsContent>
+            
+            <TabsContent value="manual">
+              <div className="border rounded-md p-4">
+                <h2 className="text-lg font-semibold mb-4">Add Boxes</h2>
+                <BoxForm onAddBox={addBox} />
+              </div>
+            </TabsContent>
+          </Tabs>
           
           <CapacityOverview />
           
