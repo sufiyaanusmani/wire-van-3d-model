@@ -162,9 +162,6 @@ function WireFrameVan() {
 
 function BoxesInVan({ boxes }: { boxes: BoxWithColor[] }) {
   const van = useBoxStore(state => state.van);
-  const vanDepth = van.depth / 100;
-  const vanWidth = van.width / 100;
-  const vanHeight = van.height / 100;
   
   const boxComponents = useMemo(() => {
     // Use the bin packing algorithm to get optimal positions
@@ -192,7 +189,7 @@ function BoxesInVan({ boxes }: { boxes: BoxWithColor[] }) {
         />
       );
     });
-  }, [boxes, van, vanDepth, vanWidth, vanHeight]);
+  }, [boxes, van]);
   
   return <>{boxComponents}</>;
 }
