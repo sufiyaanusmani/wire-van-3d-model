@@ -5,6 +5,7 @@ import {
   calculateCapacityUsage
 } from '@/lib/calculations';
 import { BoxData } from '@/app/components/forms/BoxForm';
+import { packBoxesInVan } from "./binPacking";
 
 interface VanDimensions {
   width: number;
@@ -29,6 +30,7 @@ interface BoxStore {
   getTotalWeight: () => number;
   getCapacityUsage: () => number;
   getWeightCapacityUsage: () => number;
+  canAllBoxesFit: () => boolean;
 }
 
 export const useBoxStore = create<BoxStore>((set, get) => ({
@@ -57,5 +59,10 @@ export const useBoxStore = create<BoxStore>((set, get) => ({
   getTotalVolume: () => calculateTotalVolume(get().boxes),
   getTotalWeight: () => calculateTotalWeight(get().boxes),
   getCapacityUsage: () => calculateCapacityUsage(get().boxes, get().van),
-  getWeightCapacityUsage: () => (get().getTotalWeight() / get().van.maxWeight) * 100
+  getWeightCapacityUsage: () => (get().getTotalWeight() / get().van.maxWeight) * 100,
+  canAllBoxesFit: () => {
+    const { boxes, van } = get();
+    const packedBoxes = packBoxesInVan(boxes, van);
+    return packedBoxes.length === boxes.length;
+  }
 }));
