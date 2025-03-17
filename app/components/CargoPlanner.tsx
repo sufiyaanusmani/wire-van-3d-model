@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, RefreshCw } from "lucide-react";
 import { ChatBox } from "./forms/ChatBox";
+import { extractBoxesFromText } from "@/lib/groqService";
+import { useBoxStore } from "@/lib/store";
 
 interface Message {
   id: string;
@@ -15,6 +17,7 @@ interface Message {
 export function CargoPlanner() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const addBox = useBoxStore(state => state.addBox);
 
   const handleSubmit = async (content: string) => {
     // Add user message to the chat
@@ -27,18 +30,43 @@ export function CargoPlanner() {
     setMessages((prev) => [...prev, userMessage]);
     setIsProcessing(true);
     
-    // In a real implementation, you would call your LLM service here
-    // For now, we'll just simulate a response after a delay
-    setTimeout(() => {
+    try {
+      // Extract boxes from text using Groq
+      const boxes = await extractBoxesFromText(content);
+      
+      // Add boxes to the store
+      boxes.forEach(box => {
+        // Handle multiple quantities by adding the same box multiple times
+        addBox({
+          length: box.length,
+          width: box.width,
+          height: box.height,
+          weight: box.weight
+        });
+      });
+      
+      // Add assistant response
       const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: Date.now().toString(),
         role: "assistant",
-        content: "I'll help you arrange those items in your van. I've created 3D models based on your description and calculated the best arrangement.",
+        content: `I've added ${boxes.length} cargo items to your van.`
       };
       
       setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error("Error processing cargo:", error);
+      
+      // Add error message
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        role: "assistant",
+        content: "I'm sorry, I couldn't process your cargo request. Please try describing your items with more details."
+      };
+      
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsProcessing(false);
-    }, 1500);
+    }
   };
 
   const clearChat = () => {
