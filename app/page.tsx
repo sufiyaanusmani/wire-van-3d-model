@@ -20,7 +20,6 @@ export default function Home() {
 
   return (
     <main className="container mx-auto py-8 px-4">
-      <h1 className="text-4xl font-bold mb-8 text-center">Wire Van 3D Model</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-1 space-y-6">
