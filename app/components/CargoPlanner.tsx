@@ -85,7 +85,7 @@ export function CargoPlanner() {
         )}
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="space-y-4 mb-4">
+        <div className="space-y-4 mb-4 h-[300px] overflow-y-auto pr-2">
           {messages.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p>Describe what you need to transport in your van</p>
