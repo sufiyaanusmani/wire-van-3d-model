@@ -22,9 +22,7 @@ export default function Home() {
     <main className="container mx-auto py-8 px-4">
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1 space-y-6">
-          <VanConfigForm />
-          
+        <div className="md:col-span-1 space-y-6">  
           <Tabs defaultValue="ai" className="w-full">
             <TabsList className="grid grid-cols-2 mb-4">
               <TabsTrigger value="ai">AI Planner</TabsTrigger>
@@ -42,6 +40,8 @@ export default function Home() {
               </div>
             </TabsContent>
           </Tabs>
+
+          <VanConfigForm />
           
           <CapacityOverview />
           

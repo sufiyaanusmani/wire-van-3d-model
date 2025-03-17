@@ -75,7 +75,7 @@ export function CargoPlanner() {
 
   return (
     <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <CardHeader className="flex flex-row items-center justify-between py-2">
         <CardTitle className="text-lg">Cargo Planner</CardTitle>
         {messages.length > 0 && (
           <Button variant="ghost" size="sm" onClick={clearChat}>
@@ -85,17 +85,17 @@ export function CargoPlanner() {
         )}
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="space-y-4 mb-4 h-[300px] overflow-y-auto pr-2">
+        <div className="space-y-2 mb-3 h-[200px] overflow-y-auto pr-2">
           {messages.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className="text-center py-4 text-muted-foreground">
               <p>Describe what you need to transport in your van</p>
-              <p className="text-sm mt-2">For example: &quot;I need to move 3 large boxes, a refrigerator, and 2 bicycles&quot;</p>
+              <p className="text-sm mt-1">For example: &quot;I need to move 3 boxes and a bicycle&quot;</p>
             </div>
           ) : (
             messages.map((message) => (
               <div
                 key={message.id}
-                className={`p-3 rounded-lg ${
+                className={`p-2 rounded-lg text-sm ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground ml-8"
                     : "bg-muted mr-8"
@@ -106,9 +106,9 @@ export function CargoPlanner() {
             ))
           )}
           {isProcessing && (
-            <div className="flex items-center space-x-2 p-3 rounded-lg bg-muted mr-8">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <p className="text-sm">Planning your cargo...</p>
+            <div className="flex items-center space-x-2 p-2 rounded-lg bg-muted mr-8 text-sm">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              <p>Planning your cargo...</p>
             </div>
           )}
         </div>
