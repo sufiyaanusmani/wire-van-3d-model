@@ -45,7 +45,7 @@ export function Box({ position, size, color, info, shape = 'box' }: BoxProps) {
         {/* Render different geometries based on shape */}
         {shape === 'box' && <boxGeometry args={[width, height, depth]} />}
         {shape === 'cylinder' && (
-          <cylinderGeometry args={[width/2, width/2, height, 32]} rotation={[Math.PI / 2, 0, 0]} />
+          <cylinderGeometry args={[width/2, width/2, height, 32]} />
         )}
         {shape === 'sphere' && <sphereGeometry args={[Math.min(width, height, depth)/2, 32, 32]} />}
         
