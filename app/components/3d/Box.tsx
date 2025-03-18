@@ -11,9 +11,10 @@ export interface BoxProps {
     dimensions: string;
     weight: number;
   };
+  shape?: 'box' | 'cylinder' | 'sphere';
 }
 
-export function Box({ position, size, color, info }: BoxProps) {
+export function Box({ position, size, color, info, shape = 'box' }: BoxProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const [width, height, depth] = size;
   
@@ -41,7 +42,13 @@ export function Box({ position, size, color, info }: BoxProps) {
   return (
     <group>
       <mesh ref={meshRef} position={position}>
-        <boxGeometry args={[width, height, depth]} />
+        {/* Render different geometries based on shape */}
+        {shape === 'box' && <boxGeometry args={[width, height, depth]} />}
+        {shape === 'cylinder' && (
+          <cylinderGeometry args={[width/2, width/2, height, 32]} rotation={[Math.PI / 2, 0, 0]} />
+        )}
+        {shape === 'sphere' && <sphereGeometry args={[Math.min(width, height, depth)/2, 32, 32]} />}
+        
         <meshStandardMaterial 
           color={color} 
           transparent={true} 
@@ -49,10 +56,14 @@ export function Box({ position, size, color, info }: BoxProps) {
           roughness={0.3}
           metalness={0.1}
         />
-        <lineSegments>
-          <edgesGeometry args={[new THREE.BoxGeometry(width, height, depth)]} />
-          <lineBasicMaterial color="black" />
-        </lineSegments>
+        
+        {/* Only add edge lines for boxes */}
+        {shape === 'box' && (
+          <lineSegments>
+            <edgesGeometry args={[new THREE.BoxGeometry(width, height, depth)]} />
+            <lineBasicMaterial color="black" />
+          </lineSegments>
+        )}
       </mesh>
       
       {info && (

@@ -186,6 +186,7 @@ function BoxesInVan({ boxes }: { boxes: BoxWithColor[] }) {
             dimensions: `${box.length}×${box.width}×${box.height}`,
             weight: box.weight
           }}
+          shape={box.shape || 'box'}
         />
       );
     });

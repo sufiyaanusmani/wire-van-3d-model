@@ -11,6 +11,7 @@ import { useBoxStore } from "@/lib/store";
 import { wouldExceedLimits } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const boxSchema = z.object({
   length: z.string().transform((val) => parseFloat(val)),
@@ -18,6 +19,7 @@ const boxSchema = z.object({
   height: z.string().transform((val) => parseFloat(val)),
   weight: z.string().transform((val) => parseFloat(val)),
   color: z.string().optional(),
+  shape: z.enum(['box', 'cylinder', 'sphere']).default('box'),
 });
 
 export type BoxData = z.infer<typeof boxSchema>;
@@ -49,6 +51,7 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
       width: 0,
       height: 0,
       weight: 0,
+      shape: 'box', // Explicitly set default shape
     },
   });
 
@@ -71,7 +74,15 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
     }
     
     onAddBox(values);
-    form.reset();
+    
+    // Reset form with explicit values to ensure UI sync
+    form.reset({
+      length: 0,
+      width: 0,
+      height: 0,
+      weight: 0,
+      shape: 'box', // Explicitly reset shape to 'box'
+    });
   }
 
   return (
@@ -143,6 +154,31 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
                 <FormControl>
                   <Input type="number" step="0.01" placeholder="Weight" {...field} />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="shape"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Shape</FormLabel>
+                <Select 
+                  onValueChange={field.onChange} 
+                  value={field.value} // Use value instead of defaultValue
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select shape" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="box">Box</SelectItem>
+                    <SelectItem value="cylinder">Cylinder</SelectItem>
+                    <SelectItem value="sphere">Sphere</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
