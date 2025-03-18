@@ -71,6 +71,9 @@ export class BinPacker {
     // Apply gravity to make sure no boxes are floating
     this.applyGravity();
     
+    // Validate that no boxes overlap
+    this.validateNoOverlaps();
+    
     return this.packed;
   }
   
@@ -179,7 +182,13 @@ export class BinPacker {
         bestSpace.position[2] + bestBoxDims[2] / 2
       ];
       
-      // Add the box to our packed list
+      // Check for collisions before placing the box, pass the shape type
+      if (this.wouldBoxOverlap(position, [bestBoxDims[0]/100, bestBoxDims[1]/100, bestBoxDims[2]/100], undefined, box.shape)) {
+        console.warn("Collision detected during placement, skipping box:", box);
+        return false;
+      }
+
+      // Only add if no collision detected
       this.packed.push({
         box,
         position,
@@ -257,54 +266,39 @@ export class BinPacker {
       for (let i = 0; i < this.packed.length; i++) {
         const box = this.packed[i];
         const dims = getRotatedDimensions(box.box, box.rotation);
-        const boxHeight = dims[1] / 100;
-        const boxWidth = dims[0] / 100;
-        const boxDepth = dims[2] / 100;
         
-        // Try to move the box down until it hits something
+        // Convert dimensions to meters for collision check
+        const dimsMeter: Vector3D = [
+          dims[0]/100, 
+          dims[1]/100, 
+          dims[2]/100
+        ];
+        
+        // Try moving the box down gradually
         const currentY = box.position[1];
         let newY = currentY;
-        const yIncrement = 0.01; // 1cm increments
+        const yIncrement = 0.005; // 0.5cm increments for faster processing
         
         while (true) {
-          // Calculate bottom of box
-          const boxBottom = newY - boxHeight / 2;
+          // Calculate potential new position
+          const testPosition: Vector3D = [
+            box.position[0], 
+            newY - yIncrement, 
+            box.position[2]
+          ];
           
           // Stop if we've reached the container bottom
-          if (boxBottom <= this.containerBottom) {
-            newY = this.containerBottom + boxHeight / 2;
+          if (testPosition[1] - dimsMeter[1]/2 <= this.containerBottom) {
+            newY = this.containerBottom + dimsMeter[1]/2;
             break;
           }
           
-          // See if the box would collide with any other box
-          let collision = false;
-          for (let j = 0; j < this.packed.length; j++) {
-            if (i === j) continue; // Skip self
-            
-            const otherBox = this.packed[j];
-            const otherDims = getRotatedDimensions(otherBox.box, otherBox.rotation);
-            const otherWidth = otherDims[0] / 100;
-            const otherHeight = otherDims[1] / 100;
-            const otherDepth = otherDims[2] / 100;
-            
-            // Check for collision
-            if (
-              Math.abs((newY - boxHeight / 2) - (otherBox.position[1] + otherHeight / 2)) < 0.001 &&
-              box.position[0] + boxWidth / 2 > otherBox.position[0] - otherWidth / 2 &&
-              box.position[0] - boxWidth / 2 < otherBox.position[0] + otherWidth / 2 &&
-              box.position[2] + boxDepth / 2 > otherBox.position[2] - otherDepth / 2 &&
-              box.position[2] - boxDepth / 2 < otherBox.position[2] + otherDepth / 2
-            ) {
-              collision = true;
-              break;
-            }
+          // Check for collision with this test position
+          if (this.wouldBoxOverlap(testPosition, dimsMeter, box)) {
+            break; // Collision found, stop moving down
           }
           
-          if (collision) {
-            break;
-          }
-          
-          // Try moving down more
+          // Move down more
           newY -= yIncrement;
         }
         
@@ -470,6 +464,162 @@ export class BinPacker {
     }
     
     return false;
+  }
+
+  /**
+   * Check if a box at the given position and dimensions would overlap with any existing boxes
+   */
+  private wouldBoxOverlap(
+    position: Vector3D,
+    boxDims: Vector3D,
+    excludeBox?: PackedBox,
+    boxType: 'box' | 'cylinder' | 'sphere' = 'box'
+  ): boolean {
+    // Check collision with each existing box
+    for (const packedBox of this.packed) {
+      // Skip if this is the box we're testing
+      if (excludeBox && packedBox === excludeBox) continue;
+      
+      const otherDims = getRotatedDimensions(packedBox.box, packedBox.rotation);
+      const otherPos = packedBox.position;
+      const otherType = packedBox.box.shape || 'box';
+      
+      // Get dimensions in consistent units (meters)
+      const boxWidth = boxDims[0];
+      const boxHeight = boxDims[1]; 
+      const boxDepth = boxDims[2];
+      
+      // Convert otherDims from cm to meters
+      const otherWidth = otherDims[0] / 100;
+      const otherHeight = otherDims[1] / 100;
+      const otherDepth = otherDims[2] / 100;
+      
+      // Calculate buffer based on shape types
+      let bufferX = 0;
+      let bufferY = 0;
+      let bufferZ = 0;
+      
+      // Add extra buffer for cylinders and spheres
+      if (boxType === 'cylinder' || otherType === 'cylinder') {
+        bufferX += 0.01; // 1cm buffer for cylinders
+        bufferZ += 0.01;
+      }
+      
+      if (boxType === 'sphere' || otherType === 'sphere') {
+        bufferX += 0.005; // 0.5cm buffer for spheres
+        bufferY += 0.005;
+        bufferZ += 0.005;
+      }
+      
+      // Check for overlap in all 3 dimensions with buffers
+      const overlapX = Math.abs(position[0] - otherPos[0]) < (boxWidth + otherWidth) / 2 + bufferX;
+      const overlapY = Math.abs(position[1] - otherPos[1]) < (boxHeight + otherHeight) / 2 + bufferY;
+      const overlapZ = Math.abs(position[2] - otherPos[2]) < (boxDepth + otherDepth) / 2 + bufferZ;
+      
+      if (overlapX && overlapY && overlapZ) {
+        return true; // Overlap detected
+      }
+    }
+    
+    return false; // No overlap
+  }
+
+  /**
+   * Validate that no boxes overlap and fix any issues
+   */
+  private validateNoOverlaps(): void {
+    let correctionsMade = 0;
+    const maxCorrections = 20; // Fewer max corrections
+    let overlapsFound = true;
+    
+    // Keep correcting until no overlaps are found or max corrections reached
+    while (overlapsFound && correctionsMade < maxCorrections) {
+      overlapsFound = false;
+      
+      // Check each pair of boxes for overlap
+      for (let i = 0; i < this.packed.length; i++) {
+        for (let j = i + 1; j < this.packed.length; j++) {
+          const boxA = this.packed[i];
+          const boxB = this.packed[j];
+          
+          // Get dimensions in meters
+          const dimsA = getRotatedDimensions(boxA.box, boxA.rotation);
+          const boxDimsA: Vector3D = [dimsA[0]/100, dimsA[1]/100, dimsA[2]/100];
+          const dimsB = getRotatedDimensions(boxB.box, boxB.rotation);
+          const boxDimsB: Vector3D = [dimsB[0]/100, dimsB[1]/100, dimsB[2]/100];
+          
+          // Check if boxes overlap
+          if (this.checkSpecificOverlap(boxA.position, boxDimsA, boxB.position, boxDimsB)) {
+            overlapsFound = true;
+            correctionsMade++;
+            
+            // Find axis with minimum overlap and separate along that axis
+            const [separationAxis, separationAmount] = this.findMinimumSeparation(
+              boxA.position, boxDimsA, 
+              boxB.position, boxDimsB
+            );
+            
+            // Move boxB along the separation axis - more gentle movement
+            boxB.position[separationAxis] += separationAmount + 0.002; // Add 2mm extra space
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Check if two specific boxes overlap
+   */
+  private checkSpecificOverlap(
+    posA: Vector3D, dimsA: Vector3D, 
+    posB: Vector3D, dimsB: Vector3D
+  ): boolean {
+    // Much smaller safety margin
+    const safetyMargin = 0.0002; 
+    
+    // Check overlap on each axis - subtract safety margin instead of adding
+    const overlapX = Math.abs(posA[0] - posB[0]) < (dimsA[0] + dimsB[0]) / 2 - safetyMargin;
+    const overlapY = Math.abs(posA[1] - posB[1]) < (dimsA[1] + dimsB[1]) / 2 - safetyMargin;
+    const overlapZ = Math.abs(posA[2] - posB[2]) < (dimsA[2] + dimsB[2]) / 2 - safetyMargin;
+    
+    return overlapX && overlapY && overlapZ;
+  }
+
+  /**
+   * Find the axis with minimum separation needed and return [axis, amount]
+   */
+  private findMinimumSeparation(
+    posA: Vector3D, dimsA: Vector3D, 
+    posB: Vector3D, dimsB: Vector3D
+  ): [number, number] {
+    // Calculate overlap on each axis
+    const overlapX = (dimsA[0] + dimsB[0]) / 2 - Math.abs(posA[0] - posB[0]);
+    const overlapY = (dimsA[1] + dimsB[1]) / 2 - Math.abs(posA[1] - posB[1]);
+    const overlapZ = (dimsA[2] + dimsB[2]) / 2 - Math.abs(posA[2] - posB[2]);
+    
+    // Find minimum positive overlap
+    let minOverlap = Infinity;
+    let axis = 0;
+    
+    if (overlapX > 0 && overlapX < minOverlap) {
+      minOverlap = overlapX;
+      axis = 0;
+    }
+    
+    if (overlapY > 0 && overlapY < minOverlap) {
+      minOverlap = overlapY;
+      axis = 1;
+    }
+    
+    if (overlapZ > 0 && overlapZ < minOverlap) {
+      minOverlap = overlapZ;
+      axis = 2;
+    }
+    
+    // Determine direction (positive or negative)
+    const direction = posB[axis] > posA[axis] ? 1 : -1;
+    
+    return [axis, minOverlap * direction];
   }
 }
 
