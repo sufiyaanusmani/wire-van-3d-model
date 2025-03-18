@@ -41,14 +41,23 @@ const boxSchema = z.object({
   message: "Height must be greater than 0",
   path: ["height"]
 }).refine(data => {
-  // Validate length and width for boxes
+  // Validate length for boxes
   if (data.shape === 'box') {
-    return data.length > 0 && data.width > 0;
+    return data.length > 0;
   }
   return true;
 }, {
-  message: "Length and width must be greater than 0",
+  message: "Length must be greater than 0",
   path: ["length"]
+}).refine(data => {
+  // Validate width for boxes
+  if (data.shape === 'box') {
+    return data.width > 0;
+  }
+  return true;
+}, {
+  message: "Width must be greater than 0",
+  path: ["width"]
 });
 
 export type BoxData = z.infer<typeof boxSchema>;
