@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No text provided" }, { status: 400 });
     }
     
-    const apiKey = process.env.GROQ_API_KEY; // Use server-side env variable (not NEXT_PUBLIC_)
+    const apiKey = process.env.GROQ_API_KEY;
     
     if (!apiKey) {
       console.error("Groq API key is not defined");
@@ -23,13 +23,20 @@ export async function POST(request: Request) {
       messages: [
         {
           role: "system",
-          content: `Extract cargo box information from text. For each item mentioned, determine:
+          content: `Extract cargo item information from text. For each item mentioned, determine:
           - length (in cm)
           - width (in cm)
           - height (in cm)
           - weight (in kg)
+          - shape (one of: "box", "cylinder", "sphere")
           
-          If dimensions or weight are not explicitly stated, use reasonable estimates.
+          Determine the most appropriate shape for each item:
+          - For rectangular or cubic items, use "box"
+          - For cylindrical objects like pipes, barrels, or tubes, use "cylinder"
+          - For spherical items like balls, use "sphere"
+          
+          If dimensions, weight, or shape are not explicitly stated, use reasonable estimates.
+          
           Return ONLY valid JSON in this exact format:
           {
             "boxes": [
@@ -37,7 +44,8 @@ export async function POST(request: Request) {
                 "length": number,
                 "width": number,
                 "height": number,
-                "weight": number
+                "weight": number,
+                "shape": "box" | "cylinder" | "sphere"
               }
               // more boxes as needed
             ]

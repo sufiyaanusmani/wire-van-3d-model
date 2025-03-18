@@ -34,12 +34,12 @@ interface BoxStore {
 }
 
 export const useBoxStore = create<BoxStore>((set, get) => ({
-  boxes: [],
+  boxes: [] as BoxWithColor[],
   van: {
-    width: 180,
-    height: 180,
-    depth: 300,
-    maxWeight: 1000
+    width: 180, // Default van width (cm)
+    height: 180, // Default van height (cm)
+    depth: 350, // Default van depth (cm)
+    maxWeight: 1500, // Default max weight (kg)
   },
   addBox: (box) => set((state) => ({
     boxes: [

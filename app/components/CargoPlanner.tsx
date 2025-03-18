@@ -36,12 +36,14 @@ export function CargoPlanner() {
       
       // Add boxes to the store
       boxes.forEach(box => {
-        // Handle multiple quantities by adding the same box multiple times
+        // Add box with all properties, including shape
         addBox({
           length: box.length,
           width: box.width,
           height: box.height,
-          weight: box.weight
+          weight: box.weight,
+          shape: box.shape, // Add this line to pass shape information
+          radius: box.radius // Add this if radius is used in your BoxData interface
         });
       });
       

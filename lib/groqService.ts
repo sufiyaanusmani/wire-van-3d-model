@@ -16,7 +16,17 @@ export async function extractBoxesFromText(text: string): Promise<BoxData[]> {
     }
 
     const data = await response.json();
-    return data.boxes || [];
+    console.log("Extracted boxes:", data);
+    
+    // Process boxes to ensure all have a shape (default to 'box' if missing)
+    const processedBoxes = (data.boxes || []).map((box: { shape: string; length: number; width: number; }) => ({
+      ...box,
+      shape: box.shape || 'box',
+      // For cylinders and spheres, handle radius calculation if needed
+      radius: box.shape === 'cylinder' || box.shape === 'sphere' ? Math.max(box.length, box.width) / 2 : undefined
+    }));
+    
+    return processedBoxes;
   } catch (error) {
     console.error("Failed to extract boxes:", error);
     throw error;
