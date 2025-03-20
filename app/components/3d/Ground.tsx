@@ -8,9 +8,9 @@ export function Ground() {
     concreteNormalMap,
     concreteRoughnessMap
   ] = useTexture([
-    '/textures/Gravel040_2K-PNG_Color.png',
-    '/textures/Gravel040_2K-PNG_NormalGL.png',
-    '/textures/Gravel040_2K-PNG_Roughness.png'
+    '/textures/Gravel040_1K-JPG_Color.jpg',
+    '/textures/Gravel040_1K-JPG_NormalGL.jpg',
+    '/textures/Gravel040_1K-JPG_Roughness.jpg'
   ]);
 
   // Configure texture repeating
