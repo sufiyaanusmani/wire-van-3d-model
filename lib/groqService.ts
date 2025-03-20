@@ -16,15 +16,52 @@ export async function extractBoxesFromText(text: string): Promise<BoxData[]> {
     }
 
     const data = await response.json();
-    console.log("Extracted boxes:", data);
     
     // Process boxes to ensure all have a shape (default to 'box' if missing)
-    const processedBoxes = (data.boxes || []).map((box: { shape: string; length: number; width: number; }) => ({
-      ...box,
-      shape: box.shape || 'box',
-      // For cylinders and spheres, handle radius calculation if needed
-      radius: box.shape === 'cylinder' || box.shape === 'sphere' ? Math.max(box.length, box.width) / 2 : undefined
-    }));
+    const processedBoxes = (data.boxes || []).map((box: { 
+      shape?: 'box' | 'cylinder' | 'sphere'; 
+      length: number; 
+      width: number;
+      height: number;
+      weight: number;
+    }) => {
+      // Default to box if no shape is specified
+      const shape = box.shape || 'box';
+      
+      // First create basic box data without radius
+      const baseBox = {
+        length: box.length,
+        width: box.width,
+        height: box.height,
+        weight: box.weight,
+        shape: shape
+      };
+      
+      // Then add radius and adjust dimensions for special shapes
+      if (shape === 'cylinder') {
+        const radius = Math.max(box.length, box.width) / 2;
+        const diameter = radius * 2;
+        return {
+          ...baseBox,
+          radius,
+          length: diameter,
+          width: diameter
+        };
+      } else if (shape === 'sphere') {
+        const radius = Math.max(box.length, box.width, box.height) / 2;
+        const diameter = radius * 2;
+        return {
+          ...baseBox,
+          radius,
+          length: diameter,
+          width: diameter,
+          height: diameter
+        };
+      }
+      
+      // Return regular box without radius
+      return baseBox;
+    }) as BoxData[];
     
     return processedBoxes;
   } catch (error) {
