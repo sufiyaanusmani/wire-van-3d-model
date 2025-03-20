@@ -197,7 +197,7 @@ export function Ground() {
       
       {/* Some scattered small boxes */}
       {[[-8, -8], [-7.2, 5], [10.3, -3]].map((pos, i) => (
-        <mesh key={`smallbox-${i}`} position={[pos[0], -0.5, pos[1]]} castShadow>
+        <mesh key={`smallbox-${i}`} position={[pos[0], -0.8, pos[1]]} castShadow>
           <boxGeometry args={[0.7, 0.7, 0.5]} />
           <meshStandardMaterial color="#A0522D" />
         </mesh>
@@ -299,7 +299,7 @@ export function Ground() {
       </group>
       
       {/* Forklift (simplified) */}
-      <group position={[8, 0, 5]} rotation={[0, Math.PI / 4, 0]}>
+      <group position={[8, -0.9, 5]} rotation={[0, Math.PI / 4, 0]}>
         {/* Base/body */}
         <mesh position={[0, 0.6, 0]} castShadow>
           <boxGeometry args={[1.8, 1.2, 3]} />
@@ -307,7 +307,7 @@ export function Ground() {
         </mesh>
         
         {/* Forks */}
-        <mesh position={[-1.2, 0.2, 0]} castShadow>
+        <mesh position={[-1.2, 0, 0]} castShadow>
           <boxGeometry args={[0.8, 0.1, 2.2]} />
           <meshStandardMaterial color="#777" metalness={0.6} />
         </mesh>
