@@ -2,63 +2,92 @@ import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
 export function Ground() {
-  // Load textures for concrete floor
+  // Load textures for gravel floor
   const [
-    concreteBaseColor,
-    concreteNormalMap,
-    concreteRoughnessMap
+    gravelBaseColor,
+    gravelNormalMap,
+    gravelRoughnessMap
   ] = useTexture([
     '/textures/Gravel040_1K-JPG_Color.jpg',
     '/textures/Gravel040_1K-JPG_NormalGL.jpg',
     '/textures/Gravel040_1K-JPG_Roughness.jpg'
   ]);
 
-  // Configure texture repeating
-  [concreteBaseColor, concreteNormalMap, concreteRoughnessMap].forEach(texture => {
+  // Load textures for concrete walls
+  const [
+    wallBaseColor,
+    wallNormalMap,
+    wallRoughnessMap
+  ] = useTexture([
+    '/textures/Planks021_1K-JPG_Color.jpg',
+    '/textures/Planks021_1K-JPG_NormalGL.jpg',
+    '/textures/Planks021_1K-JPG_Roughness.jpg'
+  ]);
+
+  // Configure floor texture repeating
+  [gravelBaseColor, gravelNormalMap, gravelRoughnessMap].forEach(texture => {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(8, 8);
   });
 
+  // Configure wall texture repeating
+  [wallBaseColor, wallNormalMap, wallRoughnessMap].forEach(texture => {
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(6, 2); // Repeated to cover the large wall surface
+  });
+
   return (
     <group>
-      {/* Enhanced concrete ground */}
+      {/* Enhanced gravel ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.2, 0]} receiveShadow>
         <planeGeometry args={[30, 30]} />
         <meshStandardMaterial 
-          map={concreteBaseColor}
-          normalMap={concreteNormalMap}
-          roughnessMap={concreteRoughnessMap}
+          map={gravelBaseColor}
+          normalMap={gravelNormalMap}
+          roughnessMap={gravelRoughnessMap}
           roughness={0.9}
           metalness={0.1}
         />
       </mesh>
       
-      {/* Subtle grid lines (more professional looking) */}
+      {/* Subtle grid lines */}
       <gridHelper 
         args={[30, 30, "#555555", "#777777"]} 
         position={[0, -1.19, 0]}
       />
       
-      {/* Loading dock walls */}
-      <mesh position={[0, 3, -15]} castShadow>
+      {/* Back wall with texture */}
+      <mesh position={[0, 3, -15]} castShadow receiveShadow>
         <boxGeometry args={[30, 8, 0.5]} />
-        <meshStandardMaterial color="#e0e0e0" />
+        <meshStandardMaterial 
+          map={wallBaseColor}
+          normalMap={wallNormalMap}
+          roughnessMap={wallRoughnessMap}
+          roughness={0.8}
+          metalness={0.1}
+        />
       </mesh>
       
-      {/* Side wall left */}
-      <mesh position={[-15, 3, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
+      {/* Side wall left with texture */}
+      <mesh position={[-15, 3, 0]} rotation={[0, Math.PI / 2, 0]} castShadow receiveShadow>
         <boxGeometry args={[30, 8, 0.5]} />
-        <meshStandardMaterial color="#d8d8d8" />
+        <meshStandardMaterial 
+          map={wallBaseColor}
+          normalMap={wallNormalMap}
+          roughnessMap={wallRoughnessMap}
+          roughness={0.8}
+          metalness={0.1}
+        />
       </mesh>
       
       {/* Loading dock platform */}
-      <mesh position={[0, -1, -10]} castShadow>
+      <mesh position={[0, -1, -10]} castShadow receiveShadow>
         <boxGeometry args={[20, 0.4, 5]} />
         <meshStandardMaterial color="#b0b0b0" />
       </mesh>
       
       {/* Warehouse ceiling */}
-      <mesh position={[0, 7, 0]}>
+      <mesh position={[0, 7, 0]} receiveShadow>
         <boxGeometry args={[30, 0.5, 30]} />
         <meshStandardMaterial color="#c0c0c0" />
       </mesh>
@@ -74,7 +103,6 @@ export function Ground() {
         </group>
       ))}
       
-      {/* Add warehouse props */}
       {/* Warehouse shelving */}
       <mesh position={[-12, 1, -12]} castShadow>
         <boxGeometry args={[5, 4, 2]} />
