@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo } from 'react';
+import { useMemo, Suspense, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { PerspectiveCamera, OrbitControls } from '@react-three/drei';
 import { useBoxStore } from '@/lib/store';
 import { Box } from './Box';
 import { Ground } from './Ground';
+import { LoadingIndicator } from '../LoadingIndicator';
 import { packBoxesInVan, getRotatedDimensions } from "@/lib/binPacking";
 import { BoxWithColor } from "@/lib/store";
 
@@ -195,19 +196,49 @@ function BoxesInVan({ boxes }: { boxes: BoxWithColor[] }) {
   return <>{boxComponents}</>;
 }
 
+// Scene component
+function Scene({ boxes }: { boxes: BoxWithColor[] }) {
+  return (
+    <>
+      <ambientLight intensity={0.5} />
+      <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
+      <PerspectiveCamera makeDefault position={[5, 5, 5]} />
+      <Ground />
+      <WireFrameVan />
+      <BoxesInVan boxes={boxes} />
+      <OrbitControls />
+    </>
+  );
+}
+
 export function VanModel() {
   const boxes = useBoxStore(state => state.boxes);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Optional: Add a minimum loading time to prevent flashing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   return (
-    <div className="h-[500px] w-full rounded-md border bg-background">
+    <div className="h-[500px] w-full rounded-md border bg-background relative">
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center z-20">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4 animate-spin"></div>
+            <div className="text-lg font-medium">Loading 3D Scene</div>
+          </div>
+        </div>
+      )}
+      
       <Canvas shadows>
-        <ambientLight intensity={0.5} />
-        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
-        <PerspectiveCamera makeDefault position={[5, 5, 5]} />
-        <Ground />
-        <WireFrameVan />
-        <BoxesInVan boxes={boxes} />
-        <OrbitControls />
+        <Suspense fallback={<LoadingIndicator />}>
+          <Scene boxes={boxes} />
+        </Suspense>
       </Canvas>
     </div>
   );
