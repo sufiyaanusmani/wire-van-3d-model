@@ -211,14 +211,16 @@ function Scene({ boxes }: { boxes: BoxWithColor[] }) {
   );
 }
 
+// Replace the VanModel component with this improved version
+
 export function VanModel() {
   const boxes = useBoxStore(state => state.boxes);
-  const [isLoading, setIsLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   
-  // Optional: Add a minimum loading time to prevent flashing
+  // Hide initial loading screen after a minimum time
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsLoading(false);
+      setInitialLoading(false);
     }, 1000);
     
     return () => clearTimeout(timer);
@@ -226,20 +228,24 @@ export function VanModel() {
   
   return (
     <div className="h-[500px] w-full rounded-md border bg-background relative">
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center z-20">
+      {/* Only show DOM loading indicator during initial loading */}
+      {initialLoading && (
+        <div className="absolute inset-0 flex items-center justify-center z-20 bg-background">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4 animate-spin"></div>
-            <div className="text-lg font-medium">Loading 3D Scene</div>
+            <div className="text-lg font-medium">Initializing 3D Scene</div>
           </div>
         </div>
       )}
       
-      <Canvas shadows>
-        <Suspense fallback={<LoadingIndicator />}>
-          <Scene boxes={boxes} />
-        </Suspense>
-      </Canvas>
+      {/* Only render Canvas after initial loading completes */}
+      {!initialLoading && (
+        <Canvas shadows>
+          <Suspense fallback={<LoadingIndicator message="Loading 3D assets..." />}>
+            <Scene boxes={boxes} />
+          </Suspense>
+        </Canvas>
+      )}
     </div>
   );
 }
