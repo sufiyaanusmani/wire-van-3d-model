@@ -33,6 +33,12 @@ export function Ground() {
   const [metalTexture] = useTexture(['/textures/Metal055A_1K-JPG_Color.jpg']);
   metalTexture.wrapS = metalTexture.wrapT = THREE.RepeatWrapping;
 
+  // Add logo texture
+  const [logoTexture] = useTexture(['/logo.png']);
+  
+  // Make logo texture non-repeating
+  logoTexture.wrapS = logoTexture.wrapT = THREE.ClampToEdgeWrapping;
+
   // Configure floor texture repeating
   [gravelBaseColor, gravelNormalMap, gravelRoughnessMap].forEach(texture => {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -434,6 +440,32 @@ export function Ground() {
           />
         </group>
       ))}
+
+      {/* Company Logo on the back wall */}
+      <mesh position={[-5, 4, -14.7]} rotation={[0, 0, 0]} receiveShadow>
+        <planeGeometry args={[6, 3]} />
+        <meshStandardMaterial 
+          map={logoTexture}
+          transparent={true}
+          side={THREE.DoubleSide}
+          emissive={"#ffffff"} 
+          emissiveIntensity={0.1}
+          emissiveMap={logoTexture}
+        />
+      </mesh>
+      
+      {/* Alternative logo placement on side wall */}
+      <mesh position={[-14.7, 4, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+        <planeGeometry args={[7, 3]} /> {/* Doubled the size */}
+        <meshStandardMaterial 
+          map={logoTexture}
+          transparent={true}
+          side={THREE.DoubleSide}
+          emissive={"#ffffff"} 
+          emissiveIntensity={0.2}
+          emissiveMap={logoTexture} /* Makes the logo glow */
+        />
+      </mesh>
     </group>
   );
 }
