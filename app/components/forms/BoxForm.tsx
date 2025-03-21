@@ -87,6 +87,7 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
   const form = useForm<z.infer<typeof boxSchema>>({
     resolver: zodResolver(boxSchema),
     defaultValues: {
+      name: '', // Use empty string instead of undefined
       length: 0,
       width: 0,
       height: 0,
@@ -169,7 +170,7 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
     
     // Reset form with empty name
     form.reset({
-      name: '',
+      name: '', // Empty string, not undefined
       length: 0,
       width: 0,
       height: 0,
