@@ -186,6 +186,7 @@ function BoxesInVan({ boxes }: { boxes: BoxWithColor[] }) {
           size={[boxDepth, boxHeight, boxWidth]}
           color={box.color || `hsl(${(index * 137) % 360}, 100%, 50%)`}
           info={{
+            name: box.name,
             dimensions: `${box.length}×${box.width}×${box.height}`,
             weight: box.weight
           }}

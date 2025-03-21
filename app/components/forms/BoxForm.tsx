@@ -8,13 +8,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { useBoxStore } from "@/lib/store";
-import { wouldExceedLimits } from "@/lib/utils";
+import { generateBoxName, wouldExceedLimits } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Update the schema to handle validation properly for different shapes
 const boxSchema = z.object({
+  name: z.string().optional(),
   length: z.coerce.number().min(0),
   width: z.coerce.number().min(0),
   height: z.coerce.number().min(0),
@@ -130,6 +131,11 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
     // Process values based on shape
     const processedValues = { ...values };
     
+    // Generate random name if none provided
+    if (!processedValues.name || processedValues.name.trim() === '') {
+      processedValues.name = generateBoxName(processedValues.shape);
+    }
+    
     if (values.shape === 'cylinder' && values.radius) {
       const diameter = values.radius * 2;
       processedValues.length = diameter;
@@ -161,8 +167,9 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
     
     onAddBox(processedValues);
     
-    // Reset form
+    // Reset form with empty name
     form.reset({
+      name: '',
       length: 0,
       width: 0,
       height: 0,
@@ -191,6 +198,20 @@ export function BoxForm({ onAddBox }: BoxFormProps) {
             </AlertDescription>
           </Alert>
         )}
+
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name (optional)</FormLabel>
+              <FormControl>
+                <Input type="text" placeholder="Box name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         
         <FormField
           control={form.control}
