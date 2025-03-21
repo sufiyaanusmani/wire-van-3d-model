@@ -1,7 +1,8 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState, JSX } from 'react';
 import * as THREE from 'three';
 import { Text } from '@react-three/drei';
 import { gsap } from 'gsap';
+import { useFrame, useThree } from '@react-three/fiber';
 
 export interface BoxProps {
   position: [number, number, number];
@@ -17,6 +18,20 @@ export interface BoxProps {
 export function Box({ position, size, color, info, shape = 'box' }: BoxProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const [width, height, depth] = size;
+  const [hovered, setHovered] = useState(false);
+  const [showAllLabels, setShowAllLabels] = useState(false);
+  
+  // Check if this is a global state update
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'l' || e.key === 'L') {
+        setShowAllLabels(prev => !prev);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
   
   // Add subtle animation when boxes are added
   useEffect(() => {
@@ -41,8 +56,12 @@ export function Box({ position, size, color, info, shape = 'box' }: BoxProps) {
   
   return (
     <group>
-      <mesh ref={meshRef} position={position}>
-        {/* Render different geometries based on shape */}
+      <mesh 
+        ref={meshRef} 
+        position={position}
+        onPointerOver={() => setHovered(true)}
+        onPointerOut={() => setHovered(false)}
+      >
         {shape === 'box' && <boxGeometry args={[width, height, depth]} />}
         {shape === 'cylinder' && (
           <cylinderGeometry args={[width/2, width/2, height, 32]} />
@@ -66,19 +85,47 @@ export function Box({ position, size, color, info, shape = 'box' }: BoxProps) {
         )}
       </mesh>
       
-      {info && (
-        <Text
-          position={[position[0], position[1] + height/2 + 0.05, position[2]]}
-          color="black"
-          anchorX="center"
-          anchorY="bottom"
-          fontSize={0.1}
-          maxWidth={0.5}
-          lineHeight={1.2}
-        >
-          {`${info.dimensions}\n${info.weight} kg`}
-        </Text>
+      {info && (hovered || showAllLabels) && (
+        <Billboard position={[position[0], position[1] + height/2 + 0.15, position[2]]}>
+          <group>
+            {/* Background plane - changed to white */}
+            <mesh position={[0, 0, -0.01]}>
+              <planeGeometry args={[0.8, 0.4]} />
+              <meshBasicMaterial color="white" opacity={0.9} transparent />
+            </mesh>
+            
+            {/* Text - changed to black */}
+            <Text
+              color="black"
+              anchorX="center"
+              anchorY="middle"
+              fontSize={0.12}
+              maxWidth={0.7}
+              lineHeight={1.2}
+            >
+              {`${info.dimensions}\n${info.weight} kg`}
+            </Text>
+          </group>
+        </Billboard>
       )}
+    </group>
+  );
+}
+
+// Helper component to make text labels face the camera
+function Billboard({ children, ...props }: { children: React.ReactNode } & JSX.IntrinsicElements['group']) {
+  const ref = useRef<THREE.Group>(null);
+  const { camera } = useThree();
+  
+  useFrame(() => {
+    if (ref.current) {
+      ref.current.quaternion.copy(camera.quaternion);
+    }
+  });
+  
+  return (
+    <group ref={ref} {...props}>
+      {children}
     </group>
   );
 }
