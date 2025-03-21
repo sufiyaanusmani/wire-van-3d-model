@@ -169,7 +169,6 @@ export function Box({ position, size, color, info, shape = 'box' }: BoxProps) {
               maxWidth={0.7}
               lineHeight={1.2}
               renderOrder={renderOrder + 2}
-              depthTest={false}
             >
               {textContent}
             </Text>
