@@ -21,6 +21,7 @@ function WireFrameVan() {
   
   // Define a wheel height offset
   const wheelOffset = 0.01;
+  const wheelOutwardOffset = 0.08;  // Add this constant after wheelOffset
   
   // Tire material with texture
   const tireMaterial = useMemo(() => {
@@ -155,16 +156,16 @@ function WireFrameVan() {
         <meshStandardMaterial color="#222" />
       </mesh>
       
-      {/* Enhanced Wheels - using groups to organize tire + rim combinations */}
+      {/* Enhanced Wheels - with outward offset */}
       {[
-        [depth/3, width/2],                // Front right
-        [depth/3, -width/2],               // Front left
-        [0, width/2],                      // Middle right
-        [0, -width/2],                     // Middle left
-        [-depth/3, width/2],               // Back right
-        [-depth/3, -width/2],              // Back left
-        [depth/2 + 1.1, width/2],          // Cabin right
-        [depth/2 + 1.1, -width/2]          // Cabin left
+        [depth/3, width/2 + wheelOutwardOffset],                // Front right
+        [depth/3, -width/2 - wheelOutwardOffset],               // Front left
+        [0, width/2 + wheelOutwardOffset],                      // Middle right
+        [0, -width/2 - wheelOutwardOffset],                     // Middle left
+        [-depth/3, width/2 + wheelOutwardOffset],               // Back right
+        [-depth/3, -width/2 - wheelOutwardOffset],              // Back left
+        [depth/2 + 1.1, width/2 + wheelOutwardOffset],          // Cabin right
+        [depth/2 + 1.1, -width/2 - wheelOutwardOffset]          // Cabin left
       ].map((pos, idx) => (
         <group key={idx} position={[pos[0], -height/2 + wheelOffset, pos[1]]} rotation={[Math.PI/2, 0, 0]}>
           {/* Tire */}
