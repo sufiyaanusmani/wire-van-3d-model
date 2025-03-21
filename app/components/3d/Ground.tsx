@@ -1,56 +1,46 @@
+"use client";
+
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { useMemo } from 'react';
 
 export function Ground() {
-  // Load textures for gravel floor
-  const [
-    gravelBaseColor,
-    gravelNormalMap,
-    gravelRoughnessMap
-  ] = useTexture([
+  // Load floor textures - keep your original implementation that renders textures correctly
+  const [gravelBaseColor, gravelNormalMap, gravelRoughnessMap] = useTexture([
     '/textures/Gravel040_1K-JPG_Color.jpg',
     '/textures/Gravel040_1K-JPG_NormalGL.jpg',
     '/textures/Gravel040_1K-JPG_Roughness.jpg'
   ]);
-
-  // Load textures for concrete walls
-  const [
-    wallBaseColor,
-    wallNormalMap,
-    wallRoughnessMap
-  ] = useTexture([
-    '/textures/Planks021_1K-JPG_Color.jpg',
-    '/textures/Planks021_1K-JPG_NormalGL.jpg',
-    '/textures/Planks021_1K-JPG_Roughness.jpg'
-  ]);
-
-  // Add cardboard texture for boxes
-  const [cardboardTexture] = useTexture(['/textures/Paper005_1K-JPG_Color.jpg']);
-  cardboardTexture.wrapS = cardboardTexture.wrapT = THREE.RepeatWrapping;
-
-  // Add metal texture for shelving and equipment
-  const [metalTexture] = useTexture(['/textures/Metal055A_1K-JPG_Color.jpg']);
-  metalTexture.wrapS = metalTexture.wrapT = THREE.RepeatWrapping;
-
-  // Add logo texture
-  const [logoTexture] = useTexture(['/logo.png']);
   
-  // Make logo texture non-repeating
-  logoTexture.wrapS = logoTexture.wrapT = THREE.ClampToEdgeWrapping;
-
-  // Configure floor texture repeating
+  // Configure floor textures
   [gravelBaseColor, gravelNormalMap, gravelRoughnessMap].forEach(texture => {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(8, 8);
   });
-
-  // Configure wall texture repeating
+  
+  // Load wall textures
+  const [wallBaseColor, wallNormalMap, wallRoughnessMap] = useTexture([
+    '/textures/Planks021_1K-JPG_Color.jpg',
+    '/textures/Planks021_1K-JPG_NormalGL.jpg',
+    '/textures/Planks021_1K-JPG_Roughness.jpg'
+  ]);
+  
+  // Configure wall textures
   [wallBaseColor, wallNormalMap, wallRoughnessMap].forEach(texture => {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(6, 2); // Repeated to cover the large wall surface
+    texture.repeat.set(6, 2);
   });
-
+  
+  // Load additional textures separately
+  const [cardboardTexture] = useTexture(['/textures/Paper005_1K-JPG_Color.jpg']);
+  cardboardTexture.wrapS = cardboardTexture.wrapT = THREE.RepeatWrapping;
+  
+  const [metalTexture] = useTexture(['/textures/Metal055A_1K-JPG_Color.jpg']);
+  metalTexture.wrapS = metalTexture.wrapT = THREE.RepeatWrapping;
+  
+  const [logoTexture] = useTexture(['/logo.png']);
+  logoTexture.wrapS = logoTexture.wrapT = THREE.ClampToEdgeWrapping;
+  
   // Create warning sign texture
   const cautionSignTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
@@ -119,7 +109,7 @@ export function Ground() {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     return texture;
   }, []);
-
+  
   return (
     <group>
       {/* Enhanced gravel ground */}

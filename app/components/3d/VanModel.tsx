@@ -1,14 +1,16 @@
 "use client";
 
-import { useMemo, Suspense, useState, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { PerspectiveCamera, OrbitControls } from '@react-three/drei';
-import { useBoxStore } from '@/lib/store';
-import { Box } from './Box';
-import { Ground } from './Ground';
-import { LoadingIndicator } from '../LoadingIndicator';
+import { useEffect, useState, useMemo, Suspense } from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { useBoxStore } from "@/lib/store";
 import { packBoxesInVan, getRotatedDimensions } from "@/lib/binPacking";
 import { BoxWithColor } from "@/lib/store";
+
+// Add imports for the Ground component
+import { Ground } from "./Ground"; // Keep your original Ground implementation
+import { Box } from "./Box";
+import { LoadingOverlay } from "../LoadingOverlay";
 
 function WireFrameVan() {
   const van = useBoxStore(state => state.van);
@@ -196,14 +198,19 @@ function BoxesInVan({ boxes }: { boxes: BoxWithColor[] }) {
   return <>{boxComponents}</>;
 }
 
-// Scene component
+// Scene component with Suspense for Ground
 function Scene({ boxes }: { boxes: BoxWithColor[] }) {
   return (
     <>
       <ambientLight intensity={0.5} />
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
       <PerspectiveCamera makeDefault position={[5, 5, 5]} />
-      <Ground />
+      
+      {/* Use Suspense for the Ground component */}
+      <Suspense fallback={null}>
+        <Ground />
+      </Suspense>
+      
       <WireFrameVan />
       <BoxesInVan boxes={boxes} />
       <OrbitControls />
@@ -211,41 +218,26 @@ function Scene({ boxes }: { boxes: BoxWithColor[] }) {
   );
 }
 
-// Replace the VanModel component with this improved version
-
 export function VanModel() {
   const boxes = useBoxStore(state => state.boxes);
-  const [initialLoading, setInitialLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Hide initial loading screen after a minimum time
+  // Hide loading screen after a minimum time
   useEffect(() => {
     const timer = setTimeout(() => {
-      setInitialLoading(false);
-    }, 1000);
+      setIsLoading(false);
+    }, 1500);
     
     return () => clearTimeout(timer);
   }, []);
   
   return (
     <div className="h-[500px] w-full rounded-md border bg-background relative">
-      {/* Only show DOM loading indicator during initial loading */}
-      {initialLoading && (
-        <div className="absolute inset-0 flex items-center justify-center z-20 bg-background">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4 animate-spin"></div>
-            <div className="text-lg font-medium">Initializing 3D Scene</div>
-          </div>
-        </div>
-      )}
+      {isLoading && <LoadingOverlay />}
       
-      {/* Only render Canvas after initial loading completes */}
-      {!initialLoading && (
-        <Canvas shadows>
-          <Suspense fallback={<LoadingIndicator message="Loading 3D assets..." />}>
-            <Scene boxes={boxes} />
-          </Suspense>
-        </Canvas>
-      )}
+      <Canvas shadows>
+        <Scene boxes={boxes} />
+      </Canvas>
     </div>
   );
 }
