@@ -29,6 +29,19 @@ export function Box({ position, size, color, info, shape = 'box' }: BoxProps) {
   const [showAllLabels, setShowAllLabels] = useState(false);
   const [textBounds, setTextBounds] = useState({ width: 0.8, height: 0.4 });
   
+  // Create a memoized color based on hover state
+  const currentColor = useMemo(() => {
+    if (!hovered) return color;
+    
+    // Lighten the color when hovered
+    const color3 = new THREE.Color(color);
+    color3.lerp(new THREE.Color('white'), 0.3);
+    return color3;
+  }, [color, hovered]);
+  
+  // Set up a higher renderOrder for the billboard elements
+  const renderOrder = 999;
+
   // Check if this is a global state update
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -103,11 +116,13 @@ export function Box({ position, size, color, info, shape = 'box' }: BoxProps) {
         {shape === 'sphere' && <sphereGeometry args={[Math.min(width, height, depth)/2, 32, 32]} />}
         
         <meshStandardMaterial 
-          color={color} 
+          color={currentColor} 
           transparent={true} 
           opacity={0.8} 
           roughness={0.3}
           metalness={0.1}
+          emissive={hovered ? currentColor : 'black'}
+          emissiveIntensity={hovered ? 0.3 : 0}
         />
         
         {/* Only add edge lines for boxes */}
@@ -121,11 +136,27 @@ export function Box({ position, size, color, info, shape = 'box' }: BoxProps) {
       
       {info && (hovered || showAllLabels) && (
         <Billboard position={[position[0], position[1] + height/2 + 0.25, position[2]]}>
-          <group>
+          <group renderOrder={renderOrder}>
+            {/* Background outline for better visibility */}
+            <mesh position={[0, 0, -0.011]} renderOrder={renderOrder}>
+              <planeGeometry args={[textBounds.width + 0.02, textBounds.height + 0.02]} />
+              <meshBasicMaterial 
+                color="black" 
+                opacity={0.7} 
+                transparent 
+                depthTest={false}
+              />
+            </mesh>
+            
             {/* Background plane - dynamic sizing */}
-            <mesh position={[0, 0, -0.01]}>
+            <mesh position={[0, 0, -0.01]} renderOrder={renderOrder + 1}>
               <planeGeometry args={[textBounds.width, textBounds.height]} />
-              <meshBasicMaterial color="white" opacity={0.9} transparent />
+              <meshBasicMaterial 
+                color="white" 
+                opacity={0.95} 
+                transparent 
+                depthTest={false}
+              />
             </mesh>
             
             {/* Text - with ref for measuring */}
@@ -137,6 +168,8 @@ export function Box({ position, size, color, info, shape = 'box' }: BoxProps) {
               fontSize={0.12}
               maxWidth={0.7}
               lineHeight={1.2}
+              renderOrder={renderOrder + 2}
+              depthTest={false}
             >
               {textContent}
             </Text>
