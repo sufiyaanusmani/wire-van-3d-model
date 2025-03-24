@@ -108,7 +108,6 @@ function WireFrameVan() {
           <meshStandardMaterial color="#2A3747" roughness={0.5} metalness={0.2} />
         </mesh>
         
-        
         {/* Cabin roof - with slight curvature */}
         <mesh position={[0.77, height/4 + 0.3, 0]}>
           <boxGeometry args={[1.38, 0.08, width * 0.94]} />
@@ -144,7 +143,6 @@ function WireFrameVan() {
           />
         </mesh>
         
-        
         {/* Window frames - black trim */}
         <mesh position={[1.2, 0.02, 0]} rotation={[0, 0, Math.PI * -0.13]} scale={[1.1, 1.05, 1.05]}>
           <boxGeometry args={[0.015, height/2.3, width * 0.88]} />
@@ -156,10 +154,73 @@ function WireFrameVan() {
           <meshStandardMaterial color="black" />
         </mesh>        
         
+        {/* NEW: Side windows with frames */}
+        <group position={[0.85, -height/8, width/2 * 0.95]}>
+          {/* Side window glass */}
+          <mesh>
+            <boxGeometry args={[1.2, height/3, 0.03]} />
+            <meshPhysicalMaterial 
+              color="#a7c4e2" 
+              transparent 
+              opacity={0.6} 
+              metalness={0.5} 
+              roughness={0.1} 
+              clearcoat={1} 
+            />
+          </mesh>
+          
+          {/* Window frame */}
+          <mesh scale={[1.05, 1.05, 1.5]}>
+            <boxGeometry args={[1.2, height/3, 0.01]} />
+            <meshStandardMaterial color="black" />
+          </mesh>
+        </group>
+        
+        <group position={[0.85, -height/8, -width/2 * 0.95]}>
+          {/* Side window glass */}
+          <mesh>
+            <boxGeometry args={[1.2, height/3, 0.03]} />
+            <meshPhysicalMaterial 
+              color="#a7c4e2" 
+              transparent 
+              opacity={0.6} 
+              metalness={0.5} 
+              roughness={0.1} 
+              clearcoat={1} 
+            />
+          </mesh>
+          
+          {/* Window frame */}
+          <mesh scale={[1.05, 1.05, 1.5]}>
+            <boxGeometry args={[1.2, height/3, 0.01]} />
+            <meshStandardMaterial color="black" />
+          </mesh>
+        </group>
+        
         {/* Bumper detail - lower accent */}
         <mesh position={[1.83, -height/2 + 0.05, 0]}>
           <boxGeometry args={[0.175, 0.05, width * 0.98]} />
           <meshStandardMaterial color="#222" roughness={0.5} />
+        </mesh>
+        
+        {/* NEW: Grille with more details */}
+        <mesh position={[1.82, -height/3, 0]}>
+          <boxGeometry args={[0.01, 0.25, width * 0.65]} />
+          <meshStandardMaterial color="#111" metalness={0.5} roughness={0.2} />
+        </mesh>
+        
+        {/* Grille horizontal slats */}
+        {[...Array(5)].map((_, i) => (
+          <mesh key={i} position={[1.82, -height/3 - 0.1 + i * 0.05, 0]}>
+            <boxGeometry args={[0.015, 0.015, width * 0.62]} />
+            <meshStandardMaterial color="#333" metalness={0.8} roughness={0.2} />
+          </mesh>
+        ))}
+        
+        {/* Brand logo on grille */}
+        <mesh position={[1.83, -height/3, 0]}>
+          <cylinderGeometry args={[0.08, 0.08, 0.02, 24]} />
+          <meshStandardMaterial color="#DDD" metalness={0.9} roughness={0.1} />
         </mesh>
         
         {/* Modern headlights - with complex shape */}
@@ -189,6 +250,16 @@ function WireFrameVan() {
               roughness={0}
             />
           </mesh>
+          
+          {/* NEW: LED daytime running lights */}
+          <mesh position={[0.02, -0.12, 0]}>
+            <boxGeometry args={[0.03, 0.03, 0.28]} />
+            <meshStandardMaterial 
+              color="#ffffff" 
+              emissive="#ffffff" 
+              emissiveIntensity={0.5}
+            />
+          </mesh>
         </group>
         
         <group position={[1.75, -height/3 - 0.05, -width/2 * 0.75]}>
@@ -213,6 +284,16 @@ function WireFrameVan() {
               opacity={0.8}
               metalness={0.5}
               roughness={0}
+            />
+          </mesh>
+          
+          {/* NEW: LED daytime running lights */}
+          <mesh position={[0.02, -0.12, 0]}>
+            <boxGeometry args={[0.03, 0.03, 0.28]} />
+            <meshStandardMaterial 
+              color="#ffffff" 
+              emissive="#ffffff" 
+              emissiveIntensity={0.5}
             />
           </mesh>
         </group>
@@ -255,6 +336,84 @@ function WireFrameVan() {
           </mesh>
         </group>
         
+        <group position={[1.3, -height/15, -width/2 * 0.95 - 0.15]}>
+          <mesh position={[-0.05, 0, 0]} rotation={[0, Math.PI/8, 0]}>
+            <boxGeometry args={[0.3, 0.05, 0.05]} />
+            <meshStandardMaterial color="#2A3747" />
+          </mesh>
+          
+          <mesh position={[0, 0, -0.08]} rotation={[0, -Math.PI/6, 0]}>
+            <boxGeometry args={[0.05, 0.18, 0.12]} />
+            <meshStandardMaterial color="#2A3747" roughness={0.5} />
+          </mesh>
+          
+          <mesh position={[0.01, 0, -0.08]} rotation={[0, -Math.PI/6, 0]}>
+            <boxGeometry args={[0.01, 0.15, 0.09]} />
+            <meshPhysicalMaterial 
+              color="#a7c4e2" 
+              metalness={0.9} 
+              roughness={0} 
+              clearcoat={1}
+              reflectivity={1}
+            />
+          </mesh>
+        </group>
+        
+        {/* NEW: Interior dashboard */}
+        <mesh position={[1.1, -height/6, 0]} rotation={[0, 0, -Math.PI * 0.1]}>
+          <boxGeometry args={[0.4, 0.18, width * 0.8]} />
+          <meshStandardMaterial color="#222" roughness={0.9} />
+        </mesh>
+        
+        {/* Steering wheel */}
+        <group position={[1.1, -height/6 - 0.05, -width/6]} rotation={[0, 0, -Math.PI * 0.3]}>
+          <mesh>
+            <torusGeometry args={[0.15, 0.02, 16, 32]} />
+            <meshStandardMaterial color="#333" roughness={0.5} />
+          </mesh>
+          
+          {/* Steering wheel center */}
+          <mesh>
+            <cylinderGeometry args={[0.05, 0.05, 0.03, 16]} />
+            <meshStandardMaterial color="#444" />
+          </mesh>
+        </group>
+        
+        {/* Center console screen */}
+        <mesh position={[1.1, -height/6 + 0.05, 0]} rotation={[Math.PI/2 * 0.9, 0, 0]}>
+          <planeGeometry args={[0.25, 0.15]} />
+          <meshStandardMaterial color="#111" emissive="#114477" emissiveIntensity={0.2} />
+        </mesh>
+        
+        {/* Windshield wipers */}
+        <group position={[1.55, -height/10, 0]}>
+          <mesh rotation={[0, 0, Math.PI * 0.1]}>
+            <boxGeometry args={[0.5, 0.01, 0.01]} />
+            <meshStandardMaterial color="black" />
+          </mesh>
+          
+          <mesh position={[-0.18, 0, width/4]} rotation={[0, 0, Math.PI * 0.2]}>
+            <boxGeometry args={[0.4, 0.01, 0.01]} />
+            <meshStandardMaterial color="black" />
+          </mesh>
+        </group>
+        
+        {/* Door handles */}
+        <mesh position={[0.85, -height/4, width/2 * 0.96]} rotation={[0, -Math.PI/2, 0]}>
+          <boxGeometry args={[0.08, 0.03, 0.02]} />
+          <meshStandardMaterial color="#CCC" metalness={0.7} roughness={0.3} />
+        </mesh>
+        
+        <mesh position={[0.85, -height/4, -width/2 * 0.96]} rotation={[0, Math.PI/2, 0]}>
+          <boxGeometry args={[0.08, 0.03, 0.02]} />
+          <meshStandardMaterial color="#CCC" metalness={0.7} roughness={0.3} />
+        </mesh>
+        
+        {/* License plate */}
+        <mesh position={[1.92, -height/3 - 0.05, 0]}>
+          <boxGeometry args={[0.01, 0.1, 0.3]} />
+          <meshStandardMaterial color="white" />
+        </mesh>
       </group>
       
       {/* Enhanced Wheels - with outward offset */}
