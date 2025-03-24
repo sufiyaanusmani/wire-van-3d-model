@@ -110,14 +110,14 @@ function WireFrameVan() {
         
         
         {/* Cabin roof - with slight curvature */}
-        <mesh position={[0.7, height/4 - 0.1, 0]}>
-          <boxGeometry args={[1.3, 0.08, width * 0.94]} />
+        <mesh position={[0.77, height/4 + 0.3, 0]}>
+          <boxGeometry args={[1.38, 0.08, width * 0.94]} />
           <meshStandardMaterial color="#2A3747" roughness={0.5} metalness={0.2} />
         </mesh>
         
         {/* Windshield - realistic angle and proper glass material */}
-        <mesh position={[1.2, 0.02, 0]} rotation={[0, 0, Math.PI * -0.13]}>
-          <boxGeometry args={[0.04, height/2.3, width * 0.88]} />
+        <mesh position={[1.5, 0.02, 0]} rotation={[0, 0, Math.PI * 0.03]}>
+          <boxGeometry args={[0.04, height/1.2, width * 0.88]} />
           <meshPhysicalMaterial 
             color="#a7c4e2" 
             transparent 
@@ -132,7 +132,7 @@ function WireFrameVan() {
         
         {/* Back window of cabin (connecting to cargo) */}
         <mesh position={[0.1, 0, 0]}>
-          <boxGeometry args={[0.03, height/2.5, width * 0.88]} />
+          <boxGeometry args={[0.03, height/1.2, width * 0.88]} />
           <meshPhysicalMaterial 
             color="#a7c4e2" 
             transparent 
@@ -145,9 +145,6 @@ function WireFrameVan() {
         </mesh>
         
         
-        
-        
-        
         {/* Window frames - black trim */}
         <mesh position={[1.2, 0.02, 0]} rotation={[0, 0, Math.PI * -0.13]} scale={[1.1, 1.05, 1.05]}>
           <boxGeometry args={[0.015, height/2.3, width * 0.88]} />
@@ -157,19 +154,7 @@ function WireFrameVan() {
         <mesh position={[0.1, 0, 0]} scale={[1.1, 1.05, 1.05]}>
           <boxGeometry args={[0.015, height/2.5, width * 0.88]} />
           <meshStandardMaterial color="black" />
-        </mesh>
-        
-        
-        
-        
-        
-        {/* Brand logo circle in center of grille */}
-        <mesh position={[1.83, -height/3, 0]}>
-          <cylinderGeometry args={[0.08, 0.08, 0.02, 24]} />
-          <meshStandardMaterial color="#CCC" metalness={0.9} roughness={0.1} />
-        </mesh>
-        
-        
+        </mesh>        
         
         {/* Bumper detail - lower accent */}
         <mesh position={[1.83, -height/2 + 0.05, 0]}>
@@ -232,10 +217,6 @@ function WireFrameVan() {
           </mesh>
         </group>
         
-        
-        
-        
-        
         {/* Fog lights - recessed in bumper */}
         <mesh position={[1.89, -height/2 + 0.17, width/3]}>
           <cylinderGeometry args={[0.05, 0.05, 0.04, 16]} />
@@ -247,19 +228,11 @@ function WireFrameVan() {
           <meshStandardMaterial color="#f7f9d0" emissive="#f7f9d0" emissiveIntensity={0.2} />
         </mesh>
         
-        
-        
-        
-        
-        
-        
-        
-        
         {/* Realistic side mirrors */}
-        <group position={[1.3, -height/6, width/2 * 0.95 + 0.15]}>
+        <group position={[1.3, -height/15, width/2 * 0.95 + 0.15]}>
           {/* Mirror arm - with proper perspective */}
           <mesh position={[-0.05, 0, 0]} rotation={[0, -Math.PI/8, 0]}>
-            <boxGeometry args={[0.1, 0.05, 0.05]} />
+            <boxGeometry args={[0.3, 0.05, 0.05]} />
             <meshStandardMaterial color="#2A3747" />
           </mesh>
           
@@ -281,11 +254,6 @@ function WireFrameVan() {
             />
           </mesh>
         </group>
-        
-        
-        
-        
-        
         
       </group>
       
