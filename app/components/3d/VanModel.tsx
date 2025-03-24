@@ -88,73 +88,206 @@ function WireFrameVan() {
         <meshBasicMaterial color="#444" side={2} />
       </mesh>
       
-      {/* Cabin base */}
-      <mesh position={[depth/2 + 0.8, -height/4, 0]}>
-        <boxGeometry args={[1.6, height/2, width]} />
-        <meshStandardMaterial color="#3a4b5c" />
-      </mesh>
-      
-      {/* Cabin roof - slightly rounded */}
-      <mesh position={[depth/2 + 0.8, 0, 0]}>
-        <boxGeometry args={[1.6, height/10, width]} />
-        <meshStandardMaterial color="#3a4b5c" />
-      </mesh>
-      
-      {/* Windshield - angled */}
-      <mesh position={[depth/2 + 1.3, -height/6, 0]} rotation={[0, 0, Math.PI * -0.15]}>
-        <boxGeometry args={[0.02, height/2.2, width-0.3]} />
-        <meshStandardMaterial color="#a1c7dc" transparent opacity={0.7} />
-      </mesh>
-      
-      {/* Front grill/radiator */}
-      <mesh position={[depth/2 + 1.8, -height/3, 0]}>
-        <boxGeometry args={[0.1, height/5, width-0.3]} />
-        <meshStandardMaterial color="#222222" />
-      </mesh>
-      
-      {/* Hood - sloped */}
-      <mesh position={[depth/2 + 1.55, -height/3 + 0.15, 0]} rotation={[0, 0, Math.PI * 0.03]}>
-        <boxGeometry args={[0.4, 0.05, width-0.2]} />
-        <meshStandardMaterial color="#3a4b5c" />
-      </mesh>
-      
-      {/* Front bumper with detail */}
-      <mesh position={[depth/2 + 1.88, -height/2 + 0.15, 0]}>
-        <boxGeometry args={[0.12, 0.3, width]} />
-        <meshStandardMaterial color="#222" />
-      </mesh>
-      
-      {/* Bumper back */}
-      <mesh position={[-depth/2 - 0.05, -height/2 + 0.2, 0]}>
-        <boxGeometry args={[0.1, 0.3, width+0.1]} />
-        <meshStandardMaterial color="#222" />
-      </mesh>
-      
-      {/* Headlights - rectangular */}
-      <mesh position={[depth/2 + 1.85, -height/3, width/2-0.3]}>
-        <boxGeometry args={[0.05, 0.15, 0.25]} />
-        <meshStandardMaterial color="#f7f9d0" emissive="#f7f9d0" emissiveIntensity={0.5} />
-      </mesh>
-      <mesh position={[depth/2 + 1.85, -height/3, -width/2+0.3]}>
-        <boxGeometry args={[0.05, 0.15, 0.25]} />
-        <meshStandardMaterial color="#f7f9d0" emissive="#f7f9d0" emissiveIntensity={0.5} />
-      </mesh>
-      
-      {/* License plate */}
-      <mesh position={[depth/2 + 1.89, -height/2 + 0.35, 0]}>
-        <boxGeometry args={[0.01, 0.12, 0.3]} />
-        <meshStandardMaterial color="#ffffff" />
-      </mesh>
-      
-      {/* Side mirrors */}
-      <mesh position={[depth/2 + 1.2, -height/4, width/2 + 0.15]}>
-        <boxGeometry args={[0.1, 0.1, 0.05]} />
-        <meshStandardMaterial color="#222" />
-      </mesh>
-      <mesh position={[depth/2 + 1.2, -height/4, -width/2 - 0.15]}>
-        <boxGeometry args={[0.1, 0.1, 0.05]} />
-        <meshStandardMaterial color="#222" />
-      </mesh>
+      {/* REALISTIC CABIN */}
+      <group position={[depth/2, 0, 0]}>
+        {/* Main cabin body - with curved corners using multiple meshes */}
+        <mesh position={[0.8, -height/4, 0]}>
+          <boxGeometry args={[1.5, height/2, width * 0.95]} />
+          <meshStandardMaterial color="#2A3747" roughness={0.6} metalness={0.2} />
+        </mesh>
+        
+        {/* Front of cabin - with slope for aerodynamics */}
+        <mesh position={[1.45, -height/4, 0]} rotation={[0, 0, Math.PI * 0.1]}>
+          <boxGeometry args={[0.4, height/2.2, width * 0.92]} />
+          <meshStandardMaterial color="#2A3747" roughness={0.6} metalness={0.2} />
+        </mesh>
+        
+        {/* Hood with detailed shape */}
+        <mesh position={[1.6, -height/3 + 0.1, 0]}>
+          <boxGeometry args={[0.4, 0.08, width * 0.9]} />
+          <meshStandardMaterial color="#2A3747" roughness={0.5} metalness={0.2} />
+        </mesh>
+        
+        
+        {/* Cabin roof - with slight curvature */}
+        <mesh position={[0.7, height/4 - 0.1, 0]}>
+          <boxGeometry args={[1.3, 0.08, width * 0.94]} />
+          <meshStandardMaterial color="#2A3747" roughness={0.5} metalness={0.2} />
+        </mesh>
+        
+        {/* Windshield - realistic angle and proper glass material */}
+        <mesh position={[1.2, 0.02, 0]} rotation={[0, 0, Math.PI * -0.13]}>
+          <boxGeometry args={[0.04, height/2.3, width * 0.88]} />
+          <meshPhysicalMaterial 
+            color="#a7c4e2" 
+            transparent 
+            opacity={0.7} 
+            metalness={0.5} 
+            roughness={0.1} 
+            clearcoat={1} 
+            clearcoatRoughness={0.1}
+            reflectivity={0.8}
+          />
+        </mesh>
+        
+        {/* Back window of cabin (connecting to cargo) */}
+        <mesh position={[0.1, 0, 0]}>
+          <boxGeometry args={[0.03, height/2.5, width * 0.88]} />
+          <meshPhysicalMaterial 
+            color="#a7c4e2" 
+            transparent 
+            opacity={0.7} 
+            metalness={0.5} 
+            roughness={0.1} 
+            clearcoat={1} 
+            clearcoatRoughness={0.1}
+          />
+        </mesh>
+        
+        
+        
+        
+        
+        {/* Window frames - black trim */}
+        <mesh position={[1.2, 0.02, 0]} rotation={[0, 0, Math.PI * -0.13]} scale={[1.1, 1.05, 1.05]}>
+          <boxGeometry args={[0.015, height/2.3, width * 0.88]} />
+          <meshStandardMaterial color="black" />
+        </mesh>
+        
+        <mesh position={[0.1, 0, 0]} scale={[1.1, 1.05, 1.05]}>
+          <boxGeometry args={[0.015, height/2.5, width * 0.88]} />
+          <meshStandardMaterial color="black" />
+        </mesh>
+        
+        
+        
+        
+        
+        {/* Brand logo circle in center of grille */}
+        <mesh position={[1.83, -height/3, 0]}>
+          <cylinderGeometry args={[0.08, 0.08, 0.02, 24]} />
+          <meshStandardMaterial color="#CCC" metalness={0.9} roughness={0.1} />
+        </mesh>
+        
+        
+        
+        {/* Bumper detail - lower accent */}
+        <mesh position={[1.83, -height/2 + 0.05, 0]}>
+          <boxGeometry args={[0.175, 0.05, width * 0.98]} />
+          <meshStandardMaterial color="#222" roughness={0.5} />
+        </mesh>
+        
+        {/* Modern headlights - with complex shape */}
+        <group position={[1.75, -height/3 - 0.05, width/2 * 0.75]}>
+          {/* Main headlight */}
+          <mesh>
+            <boxGeometry args={[0.08, 0.15, 0.3]} />
+            <meshPhysicalMaterial 
+              color="#f5f5f5" 
+              emissive="#f3f3d9" 
+              emissiveIntensity={0.3}
+              transparent
+              opacity={0.9}
+              clearcoat={1}
+            />
+          </mesh>
+          
+          {/* Headlight glass cover */}
+          <mesh position={[0.04, 0, 0]}>
+            <boxGeometry args={[0.01, 0.17, 0.32]} />
+            <meshPhysicalMaterial 
+              color="#ffffff" 
+              clearcoat={1}
+              transparent
+              opacity={0.8}
+              metalness={0.5}
+              roughness={0}
+            />
+          </mesh>
+        </group>
+        
+        <group position={[1.75, -height/3 - 0.05, -width/2 * 0.75]}>
+          <mesh>
+            <boxGeometry args={[0.08, 0.15, 0.3]} />
+            <meshPhysicalMaterial 
+              color="#f5f5f5" 
+              emissive="#f3f3d9" 
+              emissiveIntensity={0.3}
+              transparent
+              opacity={0.9}
+              clearcoat={1}
+            />
+          </mesh>
+          
+          <mesh position={[0.04, 0, 0]}>
+            <boxGeometry args={[0.01, 0.17, 0.32]} />
+            <meshPhysicalMaterial 
+              color="#ffffff" 
+              clearcoat={1}
+              transparent
+              opacity={0.8}
+              metalness={0.5}
+              roughness={0}
+            />
+          </mesh>
+        </group>
+        
+        
+        
+        
+        
+        {/* Fog lights - recessed in bumper */}
+        <mesh position={[1.89, -height/2 + 0.17, width/3]}>
+          <cylinderGeometry args={[0.05, 0.05, 0.04, 16]} />
+          <meshStandardMaterial color="#f7f9d0" emissive="#f7f9d0" emissiveIntensity={0.2} />
+        </mesh>
+        
+        <mesh position={[1.89, -height/2 + 0.17, -width/3]}>
+          <cylinderGeometry args={[0.05, 0.05, 0.04, 16]} />
+          <meshStandardMaterial color="#f7f9d0" emissive="#f7f9d0" emissiveIntensity={0.2} />
+        </mesh>
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        {/* Realistic side mirrors */}
+        <group position={[1.3, -height/6, width/2 * 0.95 + 0.15]}>
+          {/* Mirror arm - with proper perspective */}
+          <mesh position={[-0.05, 0, 0]} rotation={[0, -Math.PI/8, 0]}>
+            <boxGeometry args={[0.1, 0.05, 0.05]} />
+            <meshStandardMaterial color="#2A3747" />
+          </mesh>
+          
+          {/* Mirror housing */}
+          <mesh position={[0, 0, 0.08]} rotation={[0, Math.PI/6, 0]}>
+            <boxGeometry args={[0.05, 0.18, 0.12]} />
+            <meshStandardMaterial color="#2A3747" roughness={0.5} />
+          </mesh>
+          
+          {/* Mirror glass */}
+          <mesh position={[0.01, 0, 0.08]} rotation={[0, Math.PI/6, 0]}>
+            <boxGeometry args={[0.01, 0.15, 0.09]} />
+            <meshPhysicalMaterial 
+              color="#a7c4e2" 
+              metalness={0.9} 
+              roughness={0} 
+              clearcoat={1}
+              reflectivity={1}
+            />
+          </mesh>
+        </group>
+        
+        
+        
+        
+        
+        
+      </group>
       
       {/* Enhanced Wheels - with outward offset */}
       {[
